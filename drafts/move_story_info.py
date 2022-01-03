@@ -6,17 +6,14 @@ from bs4 import BeautifulSoup
 import feedparser
 import re
 
-mydb = mysql.connector.connect(host="localhost", user="ximena", password="Horse4horse")
+import sys
+sys.path.append('/home/ximena/auth')
+import authTS
+
+mydb = mysql.connector.connect(host=authTS.HOSTNAME, user=authTS.USERNAME, password=authTS.PASSWORD)
 mycursor = mydb.cursor()
-db_statement = "use ximenabot"
+db_statement = "use {}".format(authTS.DATABASE)
 mycursor.execute(db_statement)
-#mycon = mysql.connector.connect(
-#    host='localhost',
-#    user='ximena',
-#    password='Horse4Horse', 
-#    database='ximenabot '
-#)
-#mycursor = mycon.cursor()
 
 #story info is a tuple with the #, title, and date
 def main() -> None:

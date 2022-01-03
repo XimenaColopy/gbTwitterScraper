@@ -1,35 +1,36 @@
 import mysql.connector
-#from datetime import datetime
-#import os
-#import requests
-#from bs4 import BeautifulSoup
-#import feedparser
+import feedparser
 import re
+import sys
 
-mydb = mysql.connector.connect(host="gb.csle6sy7qkr1.us-east-1.rds.amazonaws.com", user="ximena", password="Horse4horse")
+sys.path.append('/home/ximena/auth')
+import authTS
+
+mydb = mysql.connector.connect(host=authTS.HOSTNAME, user=authTS.USERNAME, password=authTS.PASSWORD)
 mycursor = mydb.cursor()
-db_statement = "use ximena"
+db_statement = "use {}".format(authTS.DATABASE)
 mycursor.execute(db_statement)
 
 
 def retrieveTwitters(title):
+    """Returns all the twitters associated with a story"""
     twitters = []
     sql = "select story_id from Stories where title = %s"
     args = (title, )
     mycursor.execute(sql, args)
-    Id = mycursor.fetchall()
-    Id = Id[0]
-    Id = Id[0]
+    s_id = mycursor.fetchall()[0][0]
+    #Id = Id[0]
+    #Id = Id[0]
 
     sql = 'select handle_id from Intersect where story_id = %s'
-    args = (Id, )
+    args = (s_id, )
     mycursor.execute(sql, args)
-    hid = mycursor.fetchall()
+    h_id = mycursor.fetchall()
     try:
-        hid = list(zip(*hid))[0]
+        h_id = list(zip(*h_id))[0]
         #print('list of handle id:', hid)
         sql = 'select handle from Handles where handle_id = %s'
-        for i in hid:
+        for i in h_id:
             args = (i, )
             mycursor.execute(sql, args)
             handle = mycursor.fetchall()
@@ -54,7 +55,6 @@ def insertStoryInfo(info):
 
 def insertTwitters(info, twitters):
     title = info[0]
-    #story_number = findIdFromName("story_id", "Stories", title)
     handles = []
     for handle in twitters:
         bad_handle = check_if_bad(handle)
@@ -80,6 +80,7 @@ def insertIntoIntersect(twitters, info):
         mydb.commit()
 
 def testIfItemExists(table_name, item):
+    """Helper function. All the handles and story titles are unqiue. Tells if the story or twitter already exists"""
     if table_name == "Handles":
         column_name = "handle"
     if table_name == "Stories":
@@ -112,7 +113,8 @@ def findIdFromName(table_name, item):
     except:
         return -1
         
-def closeGap(table_name): #closing the gap to get rid of the auto incrementing bug. 
+def closeGap(table_name): 
+    """Closing the gap to get rid of the auto incrementing bug."""
     if table_name == "Handles":
         column_name = "handle_id"
     elif  table_name == "Stories":
@@ -136,13 +138,16 @@ def closeGap(table_name): #closing the gap to get rid of the auto incrementing b
 
 
 def check_if_bad(handle):
-        sql = "select EXISTS(select * from bad_handles where handle = %s)"
-        args = (handle, )
-        mycursor.execute(sql, args)
-        bad_handle = mycursor.fetchall()
-        bad_handle = bad_handle[0]
-        bad_handle = bad_handle[0]
-        allowed_characters = re.compile('[a-zA-Z0-9_-]+$')
-        if not allowed_characters.match(handle):
-            bad_handle = 0
-        return bad_handle
+    """This is a helper function. There are specific twitter handles that tend to get pulled that known to be bad, this checks for that."""
+    sql = "select EXISTS(select * from bad_handles where handle = %s)"
+    args = (handle, )
+    mycursor.execute(sql, args)
+    bad_handle = mycursor.fetchall()
+    bad_handle = bad_handle[0]
+    bad_handle = bad_handle[0]
+    allowed_characters = re.compile('[a-zA-Z0-9_-]+$')
+    if not allowed_characters.match(handle):
+        bad_handle = 0
+    return bad_handle
+
+

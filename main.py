@@ -27,16 +27,16 @@ while i >= 0:
     new_content = []
     entry = GrepBeatFeed.entries[i]
     story_info = storyInfo(entry, i)
-    new_story_info = insertStoryInfo(story_info)
-    print('\nNew Story Info:')
-    print(new_story_info)
+    new_story_info = insertStoryInfo(story_info) #returns none if the story is already in the database
+    print('\nStory:')
     if new_story_info != None:
+        print(new_story_info)
         urls = Links(entry)
         twitters = findTwitter(urls)
         #print('\nTwitters found')
         #for x in twitters: print(x)
         new_handles = insertTwitters(story_info, twitters)
-        print('\nInserted twitters')
+        print('Added twitters:')
         for x in new_handles: print(x)
         insertIntoIntersect(twitters, story_info)
 

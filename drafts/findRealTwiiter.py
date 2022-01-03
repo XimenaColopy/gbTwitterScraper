@@ -1,3 +1,8 @@
+
+### Lowkey I have no idea what this is. I'm pretty sure I just copied this from the internet. I doubt it works 
+### It does look cool tho...
+
+
 # TAKE HANDLES AND CONVERT TO USERID COMMA SEPARATED
  
 import tweepy

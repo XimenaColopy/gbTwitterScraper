@@ -2,8 +2,15 @@
 import yagmail
 from datetime import date
 
+import sys
+sys.path.append('/home/ximena/auth')
+import authTS
+
+
+
+
 cur_date = date.today()
-to='ximena@grepbeat.com'
+to=authTS.SENDER_EMAIL
 subject='Sample email using yagmail({})'.format(cur_date)
 contents='I am going to practice counting with indentation:'
 bullet_point = u'\u2022'
@@ -22,7 +29,7 @@ print(contents)
 
 try:
     #initializing the server connection
-    yag = yagmail.SMTP(user='ximenabotbot@gmail.com', password='Twitterbot')
+    yag = yagmail.SMTP(user=authTS.SENDER_EMAIL, password=authTS.SENDER_EMAIL_PASSWORD)
     #sending the email
     yag.send(to=to , subject=subject, contents=contents)
 except:

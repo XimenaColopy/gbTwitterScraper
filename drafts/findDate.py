@@ -2,13 +2,14 @@ import feedparser
 from datetime import datetime
 import mysql.connector
 
-mydb = mysql.connector.connect(host="localhost", user="ximena", password="Horse4horse")
+import sys
+sys.path.append('/home/ximena/auth')
+import authTS
+
+mydb = mysql.connector.connect(host=authTS.HOSTNAME, user=authTS.USERNAME, password=authTS.PASSWORD)
 mycursor = mydb.cursor()
-
-db_statement = "use ximenabot"
+db_statement = "use {}".format(authTS.DATABASE)
 mycursor.execute(db_statement)
-
-
 
 def findLinks(NewsFeed):
     i = 0 
